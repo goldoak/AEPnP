@@ -1,7 +1,6 @@
 import os
 import sys
 import json
-import logging
 import argparse
 from copy import deepcopy
 import numpy as np
@@ -9,13 +8,6 @@ import open3d as o3d
 import seaborn as sns
 palette = sns.color_palette("bright", 25)  # create color palette
 from utils import ransac_APnP, compute_errors, save_viewpoint, load_viewpoint, draw_detections
-
-
-ch = logging.StreamHandler(sys.stdout)
-logging.getLogger().setLevel(logging.INFO)
-logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d %H:%M:%S', handlers=[ch])
-
-logging.basicConfig(level=logging.INFO, format="")
 
 
 id2cls = {'02691156': 'airplane', '02808440': 'bathtub', '02818832': 'bed', '02876657': 'bottle', '02954340': 'cap',
@@ -27,7 +19,7 @@ cls2id = dict((value, key) for key, value in id2cls.items())
 
 def run_demo(viewpoint_json, save_path, cls, idx=0):
     cls_id = cls2id[cls]
-    label_path = os.path.join(dataset_path, 'annotations', f'{cls}.json')
+    label_path = os.path.join(args.dataset_path, 'annotations', f'{cls}.json')
     labels = json.load(open(label_path))
 
     # decode the ground truth pose
@@ -40,7 +32,7 @@ def run_demo(viewpoint_json, save_path, cls, idx=0):
     # check the number of keypoints
     model_id = labels[idx]['model_id']
     textured_mesh = o3d.io.read_triangle_mesh(
-        os.path.join(dataset_path, 'ShapeNetCore.v2.ply', f'{cls_id}/{model_id}.ply'))
+        os.path.join(args.dataset_path, 'ShapeNetCore.v2.ply', f'{cls_id}/{model_id}.ply'))
 
     face_ids = [kp['mesh_info']['face_index'] for kp in labels[idx]['keypoints']]
     mesh = o3d.t.geometry.TriangleMesh.from_legacy(textured_mesh)
@@ -120,9 +112,7 @@ def run_demo(viewpoint_json, save_path, cls, idx=0):
     if pred_T is not None:
         err_rot, err_trans, err_s1, err_s2 = compute_errors(pred_T, gt_T)
 
-    logging.info(' '.join([
-        f"Class: {cls}, err_rot: {err_rot:.3f}, err_trans: {err_trans:.3f}, err_s1: {err_s1:.3f}, err_s2: {err_s2:.3f}",
-    ]))
+    print(f"Class: {cls}, err_rot: {err_rot:.3f}, err_trans: {err_trans:.3f}, err_s1: {err_s1:.3f}, err_s2: {err_s2:.3f}")
 
     # draw results
     pred_img = os.path.join(save_path, f'{cls}_pred.png')
@@ -148,7 +138,7 @@ if __name__ == '__main__':
     # generate viewpoint json file
     viewpoint_path = os.path.join(args.json_path, f'{args.test_cls}.json')
     cls_id = cls2id[args.test_cls]
-    label_path = os.path.join(dargs.ataset_path, 'annotations', f'{args.test_cls}.json')
+    label_path = os.path.join(args.dataset_path, 'annotations', f'{args.test_cls}.json')
     labels = json.load(open(label_path))
     rand_idx = np.random.randint(len(labels))
     model_id = labels[rand_idx]['model_id']

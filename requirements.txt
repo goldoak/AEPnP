@@ -1,8 +1,6 @@
 torch==1.5.1
 numpy
 scipy
-opencv-python
-easydict
-matplotlib
+opencv-python==4.5.3.56
 seaborn
-open3d
+open3d==0.14.1

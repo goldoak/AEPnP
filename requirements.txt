@@ -1,0 +1,8 @@
+torch==1.5.1
+numpy
+scipy
+opencv-python
+easydict
+matplotlib
+seaborn
+open3d

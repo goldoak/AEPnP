@@ -120,13 +120,13 @@ def run_demo(viewpoint_json, save_path, cls, idx=0):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--json_path', type=str, default='./json', help='')
-    parser.add_argument('--dataset_path', type=str, default='./keypoint', help='')
-    parser.add_argument('--save_path', type=str, default='vis', help='')
+    parser.add_argument('--json_path', type=str, default='./json', help='path to save viewpoint json file')
+    parser.add_argument('--dataset_path', type=str, default='./keypoint', help='path to dataset')
+    parser.add_argument('--save_path', type=str, default='vis', help='path to save images')
     parser.add_argument('--test_cls', type=str, default='car', choices=['airplane', 'bathtub', 'bed', 'bottle', 
                                                                         'cap', 'car', 'chair', 'guitar', 
                                                                         'helmet', 'knife', 'laptop', 'motorcycle', 
-                                                                        'mug', 'skateboard', 'table', 'vessel'], help='')
+                                                                        'mug', 'skateboard', 'table', 'vessel'], help='class name for testing')
     args = parser.parse_args()
 
     if not os.path.exists(args.json_path):

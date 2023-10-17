@@ -1,6 +1,6 @@
 # APnP
 
-This repository contains code and resources related to the paper [APnP: A Less-constrained PnP Solver for Pose Estimation with Unknown Anisotropic Scaling or Focal Lengths]() by Jiaxin Wei, Stefan Leutenegger, and Laurent Kneip.
+This repository contains code and resources related to the paper [APnP: A Less-constrained PnP Solver for Pose Estimation with Unknown Anisotropic Scaling or Focal Lengths](https://arxiv.org/abs/2310.09982) by Jiaxin Wei, Stefan Leutenegger, and Laurent Kneip.
 
 ![llustration of the two practical cases in camera pose estimation with relaxed constraints.](images/teaser.jpg)
 
@@ -51,7 +51,16 @@ The ground truth and predictions are denoted by green and red bounding boxes, re
 
 If you find our work useful in your research, please cite our paper:
 
-
+```
+@misc{wei2023apnp,
+      title={AP$n$P: A Less-constrained P$n$P Solver for Pose Estimation with Unknown Anisotropic Scaling or Focal Lengths}, 
+      author={Jiaxin Wei and Stefan Leutenegger and Laurent Kneip},
+      year={2023},
+      eprint={2310.09982},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+```
 
 If you have any questions, please feel free to contact Jiaxin Wei (weijx1421@foxmail.com).
 

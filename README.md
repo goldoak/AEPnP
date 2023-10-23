@@ -62,5 +62,5 @@ If you find our work useful in your research, please cite our paper:
 }
 ```
 
-If you have any questions, please feel free to contact Jiaxin Wei (weijx1421@foxmail.com).
+If you have any questions, please feel free to contact Jiaxin Wei (jiaxin.wei@tum.de/weijx1421@foxmail.com).
 

@@ -2,7 +2,7 @@
 
 This repository contains code and resources related to the paper [AEPnP: A Less-constrained EPnP Solver for Pose Estimation with Anisotropic Scaling](https://arxiv.org/abs/2310.09982) by Jiaxin Wei, Stefan Leutenegger, and Laurent Kneip.
 
-![llustration of the practical cases in camera pose estimation with relaxed constraints.](images/teaser.jpg)
+![llustration of the practical cases in camera pose estimation with relaxed constraints.](images/teaser.jpg?)
 
 
 ## Abstract

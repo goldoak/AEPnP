@@ -1,140 +1,18 @@
 from copy import deepcopy
 import numpy as np
 import cv2
-from scipy.spatial.transform import Rotation
-from scipy.optimize import least_squares
 import open3d as o3d
 
-from apnp import APnPSolver
+from aepnp import AEPnPSolver
 
 
-def decompose_solution(T):
-    scaled_rotation = T[:3, :3]
-    tvec = T[:3, 3]
-
-    scale = np.eye(3)
-    scale[1, 1] = np.linalg.norm(scaled_rotation[:, 1])
-    scale[2, 2] = np.linalg.norm(scaled_rotation[:, 2])
-
-    rotation = deepcopy(scaled_rotation)
-    rotation[:, 1] /= scale[1, 1]
-    rotation[:, 2] /= scale[2, 2]
-
-    return rotation, tvec, scale
-
-
-def x2T(x):
-    T = np.eye(4)
-    r = Rotation.from_quat(x[:4])
-    T[:3, :3] = r.as_matrix()
-    T[:3, 3] = x[4:7]
-    T[:3, 1] *= x[7]
-    T[:3, 2] *= x[8]
-    return T
-
-
-def T2x(T):
-    rotation, tvec, scale = decompose_solution(T)
-    r = Rotation.from_matrix(rotation)
-    x = np.concatenate([r.as_quat(), tvec, np.array([scale[1, 1], scale[2, 2]])])
-    return x
-
-
-def cost_func(x, pts_2d, pts_3d, K):
-    T = x2T(x)
-    cam_pts = np.dot(T, np.concatenate([pts_3d, np.ones((pts_3d.shape[0], 1))], axis=1).T)
-    projected_pts = np.dot(K, cam_pts[:3, :])
-    projected_pts /= projected_pts[2, :]
-    reproj_error = np.mean(np.linalg.norm(pts_2d - projected_pts[:2, :].T, axis=1))
-    return reproj_error
-
-
-def non_linear_refinement(x0, pts_2d, pts_3d, K):
-    res = least_squares(cost_func, x0, args=(pts_2d, pts_3d, K))
-    refined_T = x2T(res.x)
-    return refined_T
-
-
-def APnP(pts_2d, pts_3d, K):
+def AEPnP(pts_2d, pts_3d, refine=False):
     pts_2d = np.ascontiguousarray(pts_2d.astype(np.float64))
     pts_3d = np.ascontiguousarray(pts_3d.astype(np.float64))
-    K = K.astype(np.float64)
 
-    bearing_vectors = np.dot(np.linalg.inv(K), np.concatenate([pts_2d, np.ones((pts_2d.shape[0], 1))], axis=1).T)
-    bearing_vectors = bearing_vectors.T
-    bearing_vectors /= np.linalg.norm(bearing_vectors, axis=1, keepdims=True)
+    T = AEPnPSolver(pts_2d, pts_3d)
 
-    solutions = APnPSolver(bearing_vectors, pts_3d)
-    if len(solutions) == 0:
-        return None
-
-    min_error = np.inf
-    min_idx = None
-    for i in range(len(solutions)):
-        T = solutions[i]
-        rotation, tvec, scale = decompose_solution(T)
-        det = np.linalg.det(rotation)
-        if det < 0 or np.abs(det - 1) > 0.1:
-            continue
-        cam_pts = np.dot(T, np.concatenate([pts_3d, np.ones((pts_3d.shape[0], 1))], axis=1).T)
-        projected_pts = np.dot(K, cam_pts[:3, :])
-        projected_pts /= projected_pts[2, :]
-        reproj_error = np.sum(np.linalg.norm(pts_2d - projected_pts[:2, :].T, axis=1))
-        if reproj_error < min_error:
-            min_error = reproj_error
-            min_idx = i
-
-    if min_idx is None:
-        res = None
-    else:
-        res = solutions[min_idx]
-
-    return res
-
-
-def ransac_APnP(pts_2d, pts_3d, K, n_sample_pts=4, thresh=0.1, refine=True):
-    max_iter = 1000
-    reproj_error_thresh = thresh
-    confidence = 0.999
-    sample_size = n_sample_pts
-    n_pts = pts_2d.shape[0]
-
-    best_inlier_ratio = 0
-    best_inlier_idx = np.arange(n_pts)
-    best_T = None
-    for i in range(max_iter):
-        rand_idx = np.random.randint(n_pts, size=sample_size)
-        T = APnP(pts_2d[rand_idx, :], pts_3d[rand_idx, :], K)
-        if T is None:
-            continue
-
-        cam_pts = np.dot(T, np.concatenate([pts_3d, np.ones((pts_3d.shape[0], 1))], axis=1).T)
-        projected_pts = np.dot(K, cam_pts[:3, :])
-        if np.any(projected_pts[2, :] < 0):
-            continue
-        projected_pts /= projected_pts[2, :]
-        reproj_error = np.linalg.norm(pts_2d - projected_pts[:2, :].T, axis=1)
-
-        inlier_idx = np.where(reproj_error < reproj_error_thresh)[0]
-        n_inliers = inlier_idx.shape[0]
-        inlier_ratio = n_inliers / n_pts
-        if inlier_ratio > best_inlier_ratio:
-            best_inlier_idx = inlier_idx
-            best_inlier_ratio = inlier_ratio
-            best_T = T
-
-        # early break
-        if (1 - (1 - best_inlier_ratio ** 5) ** i) > confidence:
-            break
-
-    if refine is True and best_T is not None:
-        try:
-            x0 = T2x(best_T)
-            best_T = non_linear_refinement(x0, pts_2d[best_inlier_idx, :], pts_3d[best_inlier_idx, :], K)
-        except:
-            print('Invalid x0!')
-
-    return best_T
+    return T
 
 
 def compute_errors(T1, T2):

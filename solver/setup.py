@@ -121,11 +121,11 @@ class CMakeBuild(build_ext):
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
-    name="APnP",
+    name="AEPnP",
     version="0.1.0",
     author="Jiaxin Wei",
-    author_email="weijx@shanghaitech.edu.cn",
-    description="This is python binding of anisotropicPnP Solver for 2D-3D pose estimation",
+    author_email="jiaxin.wei@tum.de",
+    description="This is python binding of AnisotropicEPnP Solver for 2D-3D pose estimation",
     long_description="",
     ext_modules=[CMakeExtension("cmake_example")],
     cmdclass={"build_ext": CMakeBuild},

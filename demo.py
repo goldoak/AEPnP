@@ -6,7 +6,7 @@ import numpy as np
 import open3d as o3d
 import seaborn as sns
 palette = sns.color_palette("bright", 25)  # create color palette
-from utils import ransac_APnP, compute_errors, save_viewpoint, load_viewpoint, draw_detections
+from utils import AEPnP, compute_errors, save_viewpoint, load_viewpoint, draw_detections
 
 
 id2cls = {'02691156': 'airplane', '02808440': 'bathtub', '02818832': 'bed', '02876657': 'bottle', '02954340': 'cap',
@@ -85,7 +85,7 @@ def run_demo(viewpoint_json, save_path, cls, idx=0):
     model_img = os.path.join(save_path, f'{cls}.png')
     load_viewpoint([textured_mesh, *mesh_spheres], viewpoint_json, model_img)
 
-    # use APnP solver to solve for pose and scale factors
+    # use AEPnP solver to solve for pose and scale factors
     gt_T = deepcopy(cam_params.extrinsic)
     kp_3d = np.vstack(kp_3d)
     p3d_homo = np.concatenate([kp_3d, np.ones((kp_3d.shape[0], 1))], axis=1)
@@ -94,7 +94,11 @@ def run_demo(viewpoint_json, save_path, cls, idx=0):
     p2d /= p2d[2, :]
     kp_2d = p2d[:2, :].T
 
-    kp_2d += np.random.normal(0, 0.2, (kp_2d.shape[0], 2))  # add some noise to 2D coordinates
+    kp_2d += np.random.normal(0, 1, (kp_2d.shape[0], 2))  # add some noise to 2D coordinates
+
+    normalized_p2d = kp_2d  # get normalized image coordinates
+    normalized_p2d[:, 0] = (normalized_p2d[:, 0] - intrinsic[0, 2]) / intrinsic[0, 0]
+    normalized_p2d[:, 1] = (normalized_p2d[:, 1] - intrinsic[1, 2]) / intrinsic[1, 1]
 
     kp_3d[:, 1] *= s1  # re-scale 3D coordinates
     kp_3d[:, 2] *= s2
@@ -102,14 +106,9 @@ def run_demo(viewpoint_json, save_path, cls, idx=0):
     gt_T[:3, 1] /= s1
     gt_T[:3, 2] /= s2
 
-    pred_T = ransac_APnP(kp_2d, kp_3d, intrinsic, refine=False, thresh=1)
+    pred_T = AEPnP(normalized_p2d, kp_3d)
 
-    err_rot = 180
-    err_trans = np.inf
-    err_s1 = np.inf
-    err_s2 = np.inf
-    if pred_T is not None:
-        err_rot, err_trans, err_s1, err_s2 = compute_errors(pred_T, gt_T)
+    err_rot, err_trans, err_s1, err_s2 = compute_errors(pred_T, gt_T)
 
     print(f"Class: {cls}, err_rot: {err_rot:.3f}, err_trans: {err_trans:.3f}, err_s1: {err_s1:.3f}, err_s2: {err_s2:.3f}")
 

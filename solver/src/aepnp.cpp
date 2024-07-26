@@ -1,4 +1,4 @@
-#include "apnp.hpp"
+#include "aepnp.hpp"
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
@@ -9,11 +9,10 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(apnp, m) {
-  m.doc() = "Python binding for anisotropicPnP Solver implementation.";
+PYBIND11_MODULE(aepnp, m) {
+  m.doc() = "Python binding for AnisotropicEPnP Solver implementation.";
   
-  m.def("APnPSolver", &APnPSolver);
-  m.def("APnPSolver2", &APnPSolver2);
+  m.def("AEPnPSolver", &AEPnPSolver);
 
 #ifdef VERSION_INFO
   m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);

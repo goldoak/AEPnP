@@ -32,15 +32,15 @@ It displays an original 3D model, and you can select a specific viewpoint by dra
 
 Press `q` to save the current viewpoint. Here shows an example image.
 
-![Select the viewpoint.](images/img1.png)
+![Select the viewpoint.](images/img1.png?)
 
 Following that, it randomly stretches the 3D model along the y and z axes and highlights its keypoints.
 
-![Stretch and highlight.](images/img2.png)
+![Stretch and highlight.](images/img2.png?)
 
 Finally, our AEPnP solver is applied to estimate both rigid transformation and anisotropic scaling factors.
 
-![Stretch and highlight.](images/img3.png)
+![Stretch and highlight.](images/img3.png?)
 
 The ground truth and predictions are denoted by green and red bounding boxes, respectively. The length of the axis also indicates the anisotropic scaling applied along that dimension.
 

@@ -1,6 +1,6 @@
 # AEPnP
 
-This repository contains code and resources related to the paper [AEPnP: A Less-constrained EPnP Solver for Pose Estimation with Anisotropic Scaling](https://arxiv.org/abs/2310.09982) by Jiaxin Wei, Stefan Leutenegger, and Laurent Kneip.
+This repository contains the code and resources for the paper [AEPnP: A Less-constrained EPnP Solver for Pose Estimation with Anisotropic Scaling](https://arxiv.org/abs/2310.09982) by Jiaxin Wei, Stefan Leutenegger, and Laurent Kneip, published in [ECCV 2024 Workshops](https://link.springer.com/chapter/10.1007/978-3-031-91989-3_3).
 
 ![llustration of the practical cases in camera pose estimation with relaxed constraints.](images/teaser.jpg?)
 
@@ -52,13 +52,14 @@ The ground truth and predictions are denoted by green and red bounding boxes, re
 If you find our work useful in your research, please cite our paper:
 
 ```
-@misc{wei2024aepnp,
-      title={AEP$n$P: A Less-constrained EPnP Solver for Pose Estimation with Anisotropic Scaling}, 
-      author={Jiaxin Wei and Stefan Leutenegger and Laurent Kneip},
-      year={2024},
-      eprint={2310.09982},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV}
+@InProceedings{aepnp,
+author="Wei, Jiaxin
+and Leutenegger, Stefan
+and Kneip, Laurent",
+title="AEPnP: A Less-Constrained EPnP Solver for Pose Estimation with Anisotropic Scaling",
+booktitle="Computer Vision -- ECCV 2024 Workshops",
+year="2025",
+pages="37--50"
 }
 ```
 
